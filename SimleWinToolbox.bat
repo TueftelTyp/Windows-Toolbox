@@ -1,4 +1,5 @@
-:: Maggi ®2023
+:: TüftelTyp ®2023
+:: github.com/TueftelTyp
 @echo off
 title Simple Windows Toolbox
 ::mode con cols=69 lines=26 >nul ::Windowsize
@@ -22,7 +23,7 @@ echo ~
 ::echo 4  --  
 ::echo 5  --   
 echo 6  -- Release/Renew DHCP Lease 
-echo 7  -- Temporary Clean 
+echo 7  -- File Cleaner 
 echo 8  -- Reseted Settings Fix 
 echo.
 echo 9  -- Next Page
@@ -326,12 +327,14 @@ echo ##################################################################
 echo.
 echo 1 -- Clean Users Temporary Files
 echo 2 -- Clean Windows Temporary Files
+echo 3 -- Clean RecycleBin
 echo ~
 echo 0 -- Back
 echo.
 set /P varTFC="input: "
 IF /i "%varTFC%"=="1" goto USER
 IF /i "%varTFC%"=="2" goto WINDOWS
+IF /i "%varTFC%"=="3" goto RECBIN
 IF /i "%varTFC%"=="0" goto START
 :USER
 cls
@@ -415,7 +418,32 @@ call :getFoldersize "%systemdrive%\Windows\Temp"
 echo.
 pause
 goto TEMPCLEAN
-
+:RECBIN
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                     RECYCLE BIN CLEANER                        #
+echo ##################################################################
+echo.
+call :getFoldersize "%systemdrive%\$Recycle.Bin%"
+echo.
+echo Do you really want to delete all files?
+set /P varRB=" (y/n) > "
+IF /i "%varRB%"=="y" goto RECBINCLEAN
+goto TEMPCLEAN
+:RECBINCLEAN
+cls
+call :LOADLOOP
+start /b /wait powershell.exe -command "$Shell = New-Object -ComObject Shell.Application;$RecycleBin = $Shell.Namespace(0xA);$RecycleBin.Items() | foreach{Remove-Item $_.Path -Recurse -Confirm:$false}"
+cls
+echo ################################################################## 
+echo #                  ! RECYLCE BIN CLEANED UP !                    #
+echo ##################################################################
+echo.
+call :getFoldersize "%systemdrive%\$Recycle.Bin%"
+echo.
+pause
+goto TEMPCLEAN
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::: PAGE2 ::::::::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
