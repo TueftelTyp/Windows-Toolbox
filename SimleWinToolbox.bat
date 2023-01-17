@@ -255,7 +255,7 @@ pause
 :RSTSETFIX
 cls
 echo ################################################################## 
-echo #              - Simple Windows Toolbox -                 #
+echo #                 - Simple Windows Toolbox -                     #
 echo #                WINDOWS RESETED SETTINGS FIX                    #
 echo ##################################################################
 echo #                ! REPAIR REQUIERES A REBOOT !                   #
