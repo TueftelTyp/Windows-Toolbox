@@ -6,7 +6,7 @@ title Simple Windows Toolbox
 mode 70,30
 color 0A
 :START
-set VerNu=1.2.5.0
+set VerNu=1.2.5.1
 cls
 echo ################################################################## 
 echo #                 - Simple Windows Toolbox -                     #
@@ -806,7 +806,8 @@ echo 1  -- Testing Tools
 echo 2  -- Reset PC 
 echo 3  -- Install NET Framework 3.5
 echo 4  -- ProductKey 
-echo 5  -- Win11 Bypass 
+echo 5  -- Power Settings 
+echo 6  -- Win11 Bypass 
 echo ~
 echo 0  -- Main Menu
 echo.
@@ -815,7 +816,8 @@ IF /i "%varST2%"=="1" goto TESTTOOLS
 IF /i "%varST2%"=="2" goto RSTWIN10
 IF /i "%varST2%"=="3" goto FRMWK
 IF /i "%varST2%"=="4" goto PRODKEY
-IF /i "%varST2%"=="5" goto BYPS
+IF /i "%varST2%"=="5" goto POWSET
+IF /i "%varST2%"=="6" goto BYPS
 IF /i "%varST2%"=="0" goto START
 goto FAIL
 
@@ -981,6 +983,43 @@ set /P varPKDE=" (y/n) > "
 IF /i "%varPKDE%"=="y" (set slmgrV=-upk) else (goto PROKEYTO)
 slmgr %slmgrV%
 goto PROKEYTO
+:POWSET
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                    WINDOWS POWER SETTINGS                      #
+echo ##################################################################
+echo.
+echo Enter the number to start your desired method.
+echo.
+echo 1  -- Deactivate Stand-By 
+echo 2  --   Activate Stand-By 
+echo ~
+echo 0  -- Back
+echo.
+set /P varPOWR="input: "
+IF /i "%varPOWR%"=="0" goto PAGE2
+IF /i "%varPOWR%"=="1" goto DASB
+IF /i "%varPOWR%"=="2" goto ASB
+goto FAIL
+:DASB
+powercfg.exe /hibernate off >NUL
+cls
+echo ################################################################## 
+echo #                    STAND-BY  -  DEACTIVATED                    #
+echo ##################################################################
+echo.
+pause
+goto POWSET
+:ASB
+powercfg.exe /hibernate on >NUL
+cls
+echo ################################################################## 
+echo #                    STAND-BY  -    ACTIVATED                    #
+echo ##################################################################
+echo.
+pause
+goto POWSET
 :BYPS
 cls
 echo ################################################################## 
