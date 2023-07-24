@@ -1,33 +1,50 @@
 :: TüftelTyp ®2023
 :: github.com/TueftelTyp
 :: MIT License
+:: last update: Framework Check, Win10 free Activation, Admincheck
+:: todo: brower-startpage(1059-1210),AutoWinLogon(Registry)
 @echo off
 title Simple Windows Toolbox
 mode 70,30
 color 0A
+set VerNu=1.2.6.8
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                           %VerNu%                              #
+echo #                      Permission check                          #
+echo ##################################################################
+net session >nul 2>&1
+ if [%errorLevel%] == [0] (
+ 	echo # Success: Administrative permissions confirmed.                 #
+	timeout /t 10
+	goto START
+ ) else (
+ 	echo # Failure: Permissions inadequate.                               #
+	echo # For full functionality please run with administrative rights.  #
+	echo.
+	pause
+	goto START	
+ )
 :START
-set VerNu=1.2.5.1
 cls
 echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
-echo #                           %VerNu%                              #
+echo #                  - Simple Windows Toolbox -                    #
 echo #                          Main Menu                             #
-echo ##################################################################
-echo # Make sure that the application is running as an administrator. #
+echo #                              1                                 #
 echo ##################################################################
 echo.
 echo Enter the number to start your desired method.
 echo.
 echo 1  -- Windows Testmode
 echo 2  -- Integrity Checks
-echo 3  -- System File Check (sfc)
-echo 4  -- Repair Windows image (dism)
-echo 5  -- Network Tools  
-echo 6  -- Release/Renew DHCP Lease 
+echo 3  -- Repair Tools
+echo 4  -- System Informations
+echo 5  -- Network Tools 
+echo 6  -- 					 
 echo 7  -- File Cleaner 
 echo 8  -- Reseted Settings Fix 
 echo.
-echo 9  -- Next Page
+echo 9  -- Next Page 
 echo    ~~
 echo 0  -- Exit 
 echo.
@@ -38,10 +55,10 @@ set /P varST="input: "
 
 IF /i "%varST%"=="1" goto TESTMODE
 IF /i "%varST%"=="2" goto INTEGRITY
-IF /i "%varST%"=="3" goto SFC
-IF /i "%varST%"=="4" goto DISM
+IF /i "%varST%"=="3" goto REPTOOL
+IF /i "%varST%"=="4" goto SYSINFO
 IF /i "%varST%"=="5" goto NETTOOLS
-IF /i "%varST%"=="6" goto DHCPLEASE
+IF /i "%varST%"=="6" goto 					FAIL
 IF /i "%varST%"=="7" goto TEMPCLEAN
 IF /i "%varST%"=="8" goto RSTSETFIX
 IF /i "%varST%"=="9" goto PAGE2
@@ -52,7 +69,7 @@ goto FAIL
 :TESTMODE
 cls
 echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
+echo #                  - Simple Windows Toolbox -                    #
 echo #                       WINDOWS TESTMODE                         #
 echo ##################################################################
 echo.
@@ -71,7 +88,7 @@ BCDEDIT –Set LoadOptions EENABLE_INTEGRITY_CHECKS >NUL
 BCDEDIT –Set TESTSIGNING ON >NUL
 cls
 echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
+echo #                  - Simple Windows Toolbox -                    #
 echo #                 WINDOWS TESTMODE - ACTIVE                      #
 echo ##################################################################
 echo #           ! installing Unsigned Drivers enabled !              #
@@ -82,7 +99,7 @@ BCDEDIT –Set LoadOptions DDISABLE_INTEGRITY_CHECKS >NUL
 BCDEDIT –Set TESTSIGNING OFF >NUL
 cls
 echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
+echo #                  - Simple Windows Toolbox -                    #
 echo #                 WINDOWS TESTMODE - INACTIVE                    #
 echo ##################################################################
 echo #           ! installing Unsigned Drivers disabled !             #
@@ -109,7 +126,7 @@ goto FAIL
 bcdedit /set nointegritychecks on >NUL
 cls
 echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
+echo #                  - Simple Windows Toolbox -                    #
 echo #              WINDOWS INTEGRITY CHECKS - ACTIVE                 #
 echo ##################################################################
 echo #                ! Integrity Checks enabled !                    #
@@ -125,6 +142,23 @@ echo ##################################################################
 echo #                ! Integrity Checks disabled !                   #
 echo.
 goto REBOOTCHECK
+:REPTOOL
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                     WINDOWS REPAIR TOOLS                       #
+echo ##################################################################
+echo.
+echo 1  -- System File Check (sfc)
+echo 2  -- Repair Windows image (dism)
+echo ~
+echo 0 -- Back
+echo.
+set /P varRETO="input: "
+IF /i "%varRETO%"=="1" goto SFC
+IF /i "%varRETO%"=="2" goto DISM
+IF /i "%varRETO%"=="0" goto START
+goto FAIL
 :SFC
 cls
 echo ################################################################## 
@@ -150,7 +184,7 @@ IF /i "%varSFC%"=="4" goto SCANSPECADV
 IF /i "%varSFC%"=="5" goto VERIFYSPEC
 IF /i "%varSFC%"=="5" goto OWNCURFILE
 IF /i "%varSFC%"=="6" goto REPCURFILE
-IF /i "%varSFC%"=="0" goto START
+IF /i "%varSFC%"=="0" goto REPTOOL
 goto FAIL
 :SCANNOW
 cls
@@ -258,7 +292,7 @@ echo.
 set /P varDISM="input: "
 IF /i "%varDISM%"=="1" goto SCANIMG
 IF /i "%varDISM%"=="2" goto FIXIMG
-IF /i "%varDISM%"=="0" goto START
+IF /i "%varDISM%"=="0" goto REPTOOL
 goto FAIL
 :SCANIMG
 cls
@@ -278,7 +312,43 @@ echo.
 DISM /Online /Cleanup-Image /ScanHealth
 pause
 goto DISM
-
+:SYSINFO
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                     SYSTEM INFORMATIONS                        #
+echo ##################################################################
+echo.
+echo 1  -- Full GUI Information
+echo 2  -- View Manufacturer, Model and Computername
+echo 3  -- Export Systeminfo
+echo ~
+echo 0 -- Back
+echo.
+set /P varSYSI="input: "
+IF /i "%varSYSI%"=="1" msinfo32 >NUL && goto SYSINFO
+IF /i "%varSYSI%"=="2" echo. && wmic computersystem get name,model,manufacturer && pause && goto SYSINFO
+IF /i "%varSYSI%"=="3" goto SYSIEXP
+IF /i "%varSYSI%"=="0" goto START
+goto FAIL
+:SYSIEXP
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                      SYSTEM INFO EXPORT                        #
+echo ##################################################################
+echo #                Where to export the file to?                    #
+echo.
+set /P SYEXPA="Path: "
+echo.
+systeminfo /FO CSV >%SYEXPA%\SYSINFO.csv 
+call :LOADLOOP2
+echo.
+echo Your information is stored in 
+echo %SYEXPA%\SYSINFO.csv
+echo.
+pause
+goto START
 :NETTOOLS
 cls
 echo ################################################################## 
@@ -286,12 +356,13 @@ echo #                  - Simple Windows Toolbox -                    #
 echo #                         NETWORK TOOLS                          #
 echo ##################################################################
 echo.
-echo 1 -- Ping
-echo 2 -- Network Scan (arp)
-echo 3 -- Network Adapter Configuration (ipconfig)
-echo 4 -- Show connections,ports,statistics,routing table,.. (netstat)
-echo 5 -- Determine domain name of IP address or vice versa (nslookup)
-echo 6 -- Adress tracing (tracert)
+echo 1  -- Ping
+echo 2  -- Network Scan (arp)
+echo 3  -- Network Adapter Configuration (ipconfig)
+echo 4  -- Show connections,ports,statistics,routing table,.. (netstat)
+echo 5  -- Determine domain name of IP address or vice versa (nslookup)
+echo 6  -- Adress tracing (tracert)
+echo 7  -- Release/Renew DHCP Lease 
 echo ~
 echo 0  -- Main Menu
 echo.
@@ -302,6 +373,7 @@ IF /i "%varST2%"=="3" goto IPCONF
 IF /i "%varST2%"=="4" goto NETSTAT
 IF /i "%varST2%"=="5" goto NSLOOK
 IF /i "%varST2%"=="6" goto TRACE
+IF /i "%varST2%"=="7" goto DHCPLEASE
 IF /i "%varST2%"=="0" goto START
 goto FAIL
 :PING
@@ -442,35 +514,6 @@ IF /i "%varTRACE%"=="0" goto NETTOOLS
 tracert %varTRACE%
 pause
 goto NETTOOLS
-
-
-:RSTSETFIX
-cls
-echo ################################################################## 
-echo #                 - Simple Windows Toolbox -                     #
-echo #                WINDOWS RESETED SETTINGS FIX                    #
-echo ##################################################################
-echo #                ! REPAIR REQUIERES A REBOOT !                   #
-echo.
-echo. 
-set /P varRST="Do you want to restart now? <y/n>: "
-IF /i "%varRST%"=="y" goto RST
-goto START
-:RST
-cls
-echo ################################################################## 
-echo #                  - Simple Windows Toolbox -                    #
-echo #                WINDOWS RESETED SETTINGS FIX                    #
-echo ##################################################################
-echo #        ! ITS RECOMMENDED TO CLOSE ALL OPEN PROGRAMS !          #
-timeout /t 300
-echo.
-set /P varRBC="Reboot now? <y/n> "
-IF /i "%varRBC%"=="y" goto RESREBOOT
-goto START
-:RESREBOOT
-shutdown /g /t 0 /c "WinFixToolbar" >NUL
-exit
 :DHCPLEASE
 cls
 echo ################################################################## 
@@ -508,6 +551,30 @@ call LOADLOOP
 ipconfig /renew >NUL
 call JOBDONE
 goto DHCPLEASE
+:RSTSETFIX
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                WINDOWS RESETED SETTINGS FIX                    #
+echo ##################################################################
+echo #                ! REPAIR REQUIERES A REBOOT !                   #
+echo.
+echo. 
+set /P varRST="Do you want to restart now? <y/n>: "
+IF /i "%varRST%"=="y" goto RST
+goto START
+:RST
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                WINDOWS RESETED SETTINGS FIX                    #
+echo ##################################################################
+echo #        ! ITS RECOMMENDED TO CLOSE ALL OPEN PROGRAMS !          #
+timeout /t 300
+echo.
+set /P varRBC="Reboot now? <y/n> "
+IF /i "%varRBC%"=="y" shutdown /g /t 0 /c "WinFixToolbar" >NUL
+goto START
 :TEMPCLEAN
 cls
 echo ################################################################## 
@@ -797,18 +864,21 @@ goto TEMPCLEAN
 cls
 echo ################################################################## 
 echo #                  - Simple Windows Toolbox -                    #
-echo #                          Main Menu 2                           #
+echo #                          Main Menu                             #
+echo #                              2                                 #
 echo ##################################################################
 echo.
 echo Enter the number to start your desired method.
 echo.
 echo 1  -- Testing Tools
 echo 2  -- Reset PC 
-echo 3  -- Install NET Framework 3.5
+echo 3  -- Check or Install NET Framework
 echo 4  -- ProductKey 
 echo 5  -- Power Settings 
 echo 6  -- Win11 Bypass 
+echo 7  -- Browser Settings
 echo ~
+::echo 9  -- Page 3 
 echo 0  -- Main Menu
 echo.
 set /P varST2="input: "
@@ -818,10 +888,11 @@ IF /i "%varST2%"=="3" goto FRMWK
 IF /i "%varST2%"=="4" goto PRODKEY
 IF /i "%varST2%"=="5" goto POWSET
 IF /i "%varST2%"=="6" goto BYPS
+IF /i "%varST2%"=="7" goto BRWSET
+
+IF /i "%varST2%"=="9" goto PAGE3
 IF /i "%varST2%"=="0" goto START
 goto FAIL
-
-::::::::::::::::::::::::: TESTING :::::::::::::::::::::::::
 :TESTTOOLS
 cls
 echo ################################################################## 
@@ -893,6 +964,35 @@ goto PAGE2
 cls
 echo ################################################################## 
 echo #                  - Simple Windows Toolbox -                    #
+echo #               CHECK OR INSTALL .NET FRAMEWORK                  #
+echo ##################################################################
+echo #                                                                #
+echo.
+echo Enter the number to start your desired method.
+echo.
+echo 1  -- Check Version
+echo 2  -- Install NET Framework 3.5
+echo ~
+echo 0  -- Back
+echo.
+set /P varST2="input: "
+IF /i "%varST2%"=="1" goto CHKFRMWK
+IF /i "%varST2%"=="2" goto FRMWK35
+IF /i "%varST2%"=="0" goto PAGE2
+goto FAIL
+:CHKFRMWK
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                 CHECK .NET FRAMEWORK VERSION                   #
+echo ##################################################################
+start /b /wait powershell.exe -command "Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name version -EA 0 | Where { $_.PSChildName -Match '^(?!S)\p{L}'} | Select PSChildName, version"
+pause
+goto FRMWK
+:FRMWK35
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
 echo #                  INSTALL .NET FRAMEWORK 3.5                    #
 echo ##################################################################
 echo #           Make sure you've got an install medium               #
@@ -956,6 +1056,7 @@ echo 3  -- Online Activation
 echo 4  -- Offline Activation (Phone)
 echo 5  -- Key install
 echo 6  -- Key deinstall
+echo 7  -- Free Win10 Activation  (experimental)
 echo ~
 echo 0  -- Back
 echo.
@@ -967,10 +1068,29 @@ IF /i "%varPKT%"=="3" set slmgrV=-ato
 IF /i "%varPKT%"=="4" set slmgrV=-dti
 IF /i "%varPKT%"=="5" set slmgrV=-ipk & echo. & set /P varKEY="insert Key with hyphen: "
 IF /i "%varPKT%"=="6" goto SLMGRDE
+IF /i "%varPKT%"=="7" goto WIN10ACT
 echo.
 slmgr %slmgrV% %varKEY%
 pause
 goto PROKEYTO
+:WIN10ACT
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #              WINDOWS 10 ACTIVATION (experimental)              #
+echo ##################################################################
+echo Do you really want to activate Windows?
+set /P var2=" (y/n) > "
+IF /i "%var2%"=="y" goto WIN10ACTIVATE
+goto PRODKEY
+:WIN10ACTIVATE
+cls 
+slmgr.vbs /upk
+slmgr /ipk NPPR9-FWDCX-D2C8J-H872K-2YT43
+slmgr /skms zh.us.to 
+slmgr /ato
+pause
+goto MAIN
 :SLMGRDE
 cls
 echo ################################################################## 
@@ -1085,6 +1205,73 @@ echo #                 WINDOWS 11 TPM BYPASS - INACTIVE               #
 echo ################################################################## 
 pause
 goto BYPS
+:BRWSET
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                      BROWSER SETTINGS                          #
+echo ##################################################################
+echo.
+echo Enter the number to start your desired method.
+echo.
+echo 1  -- Set Home page
+echo ~
+echo 0  -- Back
+echo.
+set /P varBRW="input: "
+IF /i "%varBRW%"=="0" goto PAGE2
+IF /i "%varBRW%"=="1" goto BRHP
+goto FAIL
+:BRHP
+cls 
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                    SET BROWSER HOME PAGE                       #
+echo ##################################################################
+echo #          Which browser home page do you want to change?        #
+echo.
+echo 1  -- MS Edge 
+echo 2  -- Google Chrome
+echo 3  -- Mozilla Firefox
+echo.
+echo 9  -- Everyone
+echo ~
+echo 0  -- Back
+echo.
+set /P CHBRW="input: "
+cls
+echo.
+echo ################################################################## 
+echo #                  PLEASE CLOSE YOUR BROWSER NOW                 #
+echo ##################################################################
+timeout /t 300
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                    SET BROWSER HOME PAGE                       #
+echo ##################################################################
+echo #                  Enter your desired address                    #
+echo.
+set /P HPAGE="adress: "
+IF /i "%varCHBRW%"=="0" goto PAGE2
+IF /i "%varCHBRW%"=="1" tasklist | find /i "msedge.exe" && taskkill /im msedge.exe /F 
+IF /i "%varCHBRW%"=="1" reg add HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Edge\Main /v "Start Page" /d %HPAGE% /f >NUL
+IF /i "%varCHBRW%"=="2" tasklist | find /i "chrome.exe" && taskkill /im chrome.exe /F 
+IF /i "%varCHBRW%"=="2" reg add HKEY_LOCAL_MACHINE\SOFTWARE\Google\Chrome\Main /v "Start Page" /d %HPAGE% /f >NUL
+IF /i "%varCHBRW%"=="3" tasklist | find /i "firefox.exe" && taskkill /im firefox.exe /F 
+IF /i "%varCHBRW%"=="3" reg add HKEY_CURRENT_USER\Software\Policies\Mozilla\Firefox\Homepage /v "URL" /d %HPAGE% /f >NUL
+IF /i "%varCHBRW%"=="9" 
+cls
+echo ##################################################################
+echo #                     YOUR STARTPAGE WAS SET                     #                        
+echo ##################################################################
+echo.
+echo Your new start page has been set to 
+echo %HPAGE%
+echo.
+echo.
+pause
+goto BRWSET
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::::::::: END :::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1142,14 +1329,16 @@ echo ##################################################################
 echo.
 echo 1  -- MAIN MENU
 echo 2  -- GITHUB
-echo 9  -- LOOPSIM
+echo 8  -- LOOPSIM
+echo 9  -- LOOPSIM2
 echo ~
 echo 0  -- EXIT
 echo.
 set /P varAB="input: "
 IF /i "%varAB%"=="1" goto START
-IF /i "%varAB%"=="2" start msedge www.github.com/TueftelTyp & goto :ABOUT
-IF /i "%varAB%"=="9" goto LOADLOOP
+IF /i "%varAB%"=="2" start msedge www.github.com/TueftelTyp & goto ABOUT
+IF /i "%varAB%"=="8" call :LOADLOOP && goto ABOUT
+IF /i "%varAB%"=="9" call :LOADLOOP2 && goto ABOUT
 IF /i "%varAB%"=="0" goto EXIT
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::: FUNCTION :::::::::::::::::::::::::::::::::::
@@ -1225,6 +1414,50 @@ echo #                  - Simple Windows Toolbox -                    #
 echo #                  LOADING...    [##########]                    #
 echo ##################################################################
 timeout /t 2 /nobreak > nul
+exit /b
+:LOADLOOP2
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [          ]                    #
+echo ##################################################################
+timeout /t 1 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [#         ]                    #
+echo ##################################################################
+timeout /t 2 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [###       ]                    #
+echo ##################################################################
+timeout /t 1 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [#####     ]                    #
+echo ##################################################################
+timeout /t 2 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [########  ]                    #
+echo ##################################################################
+timeout /t 1 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [######### ]                    #
+echo ##################################################################
+timeout /t 1 /nobreak > nul
+cls
+echo ################################################################## 
+echo #                  - Simple Windows Toolbox -                    #
+echo #                  LOADING...    [##########]                    #
+echo ##################################################################
+timeout /t 1 /nobreak > nul
 exit /b
 :JOBDONE
 cls
